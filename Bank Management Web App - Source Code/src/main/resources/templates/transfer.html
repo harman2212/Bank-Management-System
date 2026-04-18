@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Money Transfer - Smart Bank</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .navbar-custom {
+            background: rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: white !important;
+        }
+        .navbar-text {
+            color: white !important;
+        }
+        .back-btn {
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+        .back-btn:hover {
+            color: #f0f0f0;
+        }
+        .transfer-container {
+            max-width: 600px;
+            margin: 30px auto 0;
+        }
+        .transfer-card {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .transfer-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        .transfer-header h2 {
+            color: #667eea;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        .transfer-header p {
+            color: #999;
+            margin: 0;
+        }
+        .form-section {
+            margin-bottom: 30px;
+        }
+        .form-label {
+            color: #333;
+            font-weight: 700;
+            margin-bottom: 10px;
+            font-size: 1rem;
+        }
+        .form-control {
+            border-radius: 10px;
+            border: 2px solid #e0e0e0;
+            padding: 15px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+            outline: none;
+        }
+        .dark-mode .form-control {
+            background: #1a1a2e;
+            border-color: #404040;
+            color: white;
+        }
+        .dark-mode .form-control::placeholder {
+            color: #cccccc;
+        }
+        .info-box {
+            background: #f8f9ff;
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+            margin-top: 10px;
+            font-size: 0.95rem;
+        }
+        .info-label {
+            color: #999;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+        .info-value {
+            color: #333;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+        .divider {
+            text-align: center;
+            margin: 30px 0;
+            position: relative;
+        }
+        .divider::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #e0e0e0;
+        }
+        .divider i {
+            background: white;
+            padding: 0 15px;
+            position: relative;
+            color: #667eea;
+            font-size: 1.5rem;
+        }
+        .btn-transfer {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 10px;
+            padding: 15px;
+            font-size: 1rem;
+            font-weight: 600;
+            color: white;
+            width: 100%;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+        .btn-transfer:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+            color: white;
+        }
+        .btn-transfer:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .warning-box {
+            background: #fef3c7;
+            border: 1px solid #f59e0b;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            color: #92400e;
+            font-size: 0.95rem;
+        }
+        .warning-box i {
+            color: #f59e0b;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Navigation -->
+<nav class="navbar navbar-expand-lg navbar-custom">
+    <div class="container">
+        <a class="navbar-brand" href="/"><i class="fas fa-university"></i> SmartBank</a>
+        <span class="navbar-text">Money Transfer</span>
+        <div style="margin-left: auto;">
+            <div id="currentTime" class="text-white" style="font-size: 0.9rem; font-weight: 500;"></div>
+        </div>
+    </div>
+</nav>
+
+<div class="transfer-container">
+    <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert" style="margin-bottom: 20px;">
+        <strong>Success:</strong> <span th:text="${successMessage}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert" style="margin-bottom: 20px;">
+        <strong>Error:</strong> <span th:text="${errorMessage}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    <a th:href="'/account/' + ${customer.id} + '/' + ${accountIndex}" class="back-btn"><i class="fas fa-arrow-left"></i> Back to Account</a>
+
+    <div class="transfer-card">
+        <div class="transfer-header">
+            <h2><i class="fas fa-exchange-alt"></i> Transfer Money</h2>
+            <p>Send money to another account securely</p>
+        </div>
+
+        <form th:action="'/transfer/' + ${customer.id} + '/' + ${accountIndex}" method="post">
+            <!-- Source Account -->
+            <div class="form-section">
+                <label class="form-label"><i class="fas fa-credit-card"></i> From (Your Account)</label>
+                <div class="info-box">
+                    <div class="info-label">Account Number</div>
+                    <div class="info-value" th:text="${sourceAccount.accountNumber}">#1000</div>
+                </div>
+                <div class="info-box" style="margin-top: 8px;">
+                    <div class="info-label">Available Balance</div>
+                    <div class="info-value">$<span th:text="${#numbers.formatDecimal(sourceAccount.balance, 1, 2)}">0.00</span></div>
+                </div>
+            </div>
+
+            <div class="divider">
+                <i class="fas fa-arrow-down"></i>
+            </div>
+
+            <!-- Target Account -->
+            <div class="form-section">
+                <label for="targetAccount" class="form-label"><i class="fas fa-receipt"></i> To (Recipient Account)</label>
+                <input type="number" class="form-control" id="targetAccount" name="targetAccountNumber" placeholder="Enter 10-digit recipient account number" min="1000000000" max="9999999999" required>
+                <small class="text-muted">Please enter the 10-digit account number of the recipient</small>
+            </div>
+
+            <!-- Transfer Amount -->
+            <div class="form-section">
+                <label for="transferAmount" class="form-label"><i class="fas fa-money-bill-wave"></i> Amount to Transfer</label>
+                <div class="input-group" style="margin-bottom: 10px;">
+                    <span class="input-group-text" style="background: #f8f9ff; border: 2px solid #e0e0e0; color: #667eea; font-weight: 600;">$</span>
+                    <input type="number" class="form-control" id="transferAmount" name="amount" step="0.01" placeholder="0.00" required>
+                </div>
+                <small class="text-muted">Maximum available: $<span th:text="${#numbers.formatDecimal(sourceAccount.balance, 1, 2)}">0.00</span></small>
+            </div>
+
+            <!-- Warning -->
+            <div class="warning-box">
+                <i class="fas fa-exclamation-triangle"></i>
+                <strong>Important:</strong> Please verify the recipient account number. Transfers cannot be reversed once sent.
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="btn-transfer">
+                <i class="fas fa-paper-plane"></i> Send Money
+            </button>
+        </form>
+    </div>
+
+    <!-- Help Section -->
+    <div style="background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2); border-radius: 15px; padding: 20px; color: white; margin-top: 20px;">
+        <h5 style="margin-bottom: 15px;"><i class="fas fa-question-circle"></i> Need Help?</h5>
+        <ul style="margin-bottom: 0; padding-left: 20px;">
+            <li>Double-check the recipient account number before sending</li>
+            <li>Ensure you have sufficient funds for the transfer</li>
+            <li>Transfers are processed immediately</li>
+            <li>Check your transaction history for confirmation</li>
+        </ul>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Update time every second
+    function updateTime() {
+        const now = new Date();
+        const timeString = now.toLocaleTimeString('en-US', { 
+            hour: '2-digit', 
+            minute: '2-digit', 
+            second: '2-digit',
+            hour12: true 
+        });
+        const dayString = now.toLocaleDateString('en-US', { 
+            weekday: 'long', 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric' 
+        });
+        document.getElementById('currentTime').textContent = timeString + ' | ' + dayString;
+    }
+    updateTime();
+    setInterval(updateTime, 1000);
+</script>
+</body>
+</html>

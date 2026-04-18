@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Savings Goals - Smart Bank</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Color+Emoji&display=swap" rel="stylesheet">
+    <style>
+        * {
+            font-family: 'Segoe UI', 'Noto Color Emoji', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            font-family: 'Segoe UI', 'Noto Color Emoji', Tahoma, Geneva, Verdana, sans-serif;
+            transition: background 0.3s ease;
+        }
+        body.dark-mode {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        }
+        .navbar-custom {
+            background: rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .navbar-brand {
+            color: white !important;
+            font-weight: 700;
+            font-size: 1.5rem;
+        }
+        .navbar-text {
+            color: white !important;
+        }
+        .dark-mode .navbar-custom {
+            background: rgba(255,255,255,0.05);
+        }
+        .back-btn {
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+        .back-btn:hover {
+            color: #f0f0f0;
+        }
+        .page-header {
+            color: white;
+            margin: 30px 0 20px 0;
+        }
+        .goal-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+        .dark-mode .goal-card {
+            background: #2d2d44;
+            color: white;
+        }
+        .goal-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+        }
+        .goal-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .dark-mode .goal-title {
+            color: white;
+        }
+        .goal-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.8rem;
+        }
+        .icon-travel {
+            background: linear-gradient(135deg, #f59e0b 0%, #f97316 100%);
+        }
+        .icon-education {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+        }
+        .icon-car {
+            background: linear-gradient(135deg, #ec4899 0%, #db2777 100%);
+        }
+        .icon-house {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+        .goal-info {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        .info-item {
+            background: #f8f9ff;
+            padding: 12px;
+            border-radius: 8px;
+            border-left: 3px solid #667eea;
+        }
+        .dark-mode .info-item {
+            background: #1a1a2e;
+            border-left-color: #667eea;
+        }
+        .info-label {
+            color: #999;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+        .dark-mode .info-label {
+            color: #aaa;
+        }
+        .info-value {
+            color: #333;
+            font-size: 1rem;
+            font-weight: 700;
+        }
+        .dark-mode .info-value {
+            color: white;
+        }
+        .progress-bar-custom {
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            height: 25px;
+            border-radius: 10px;
+        }
+        .progress-container {
+            background: #e0e0e0;
+            border-radius: 10px;
+            height: 25px;
+            overflow: hidden;
+            margin: 15px 0;
+        }
+        .dark-mode .progress-container {
+            background: #404040;
+        }
+        .progress-percent {
+            text-align: right;
+            font-weight: 700;
+            color: #333;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+        .dark-mode .progress-percent {
+            color: white;
+        }
+        .action-buttons {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .action-btn {
+            padding: 10px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            background: white;
+            color: #667eea;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            text-align: center;
+        }
+        .dark-mode .action-btn {
+            background: #1a1a2e;
+            border-color: #667eea;
+            color: #667eea;
+        }
+        .action-btn:hover {
+            background: #f8f9ff;
+            border-color: #667eea;
+        }
+        .dark-mode .action-btn:hover {
+            background: #667eea;
+            color: white;
+        }
+        .form-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        .dark-mode .form-card {
+            background: #2d2d44;
+            color: white;
+        }
+        .form-card h4 {
+            color: #667eea;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+        .form-control {
+            border-radius: 10px;
+            border: 2px solid #e0e0e0;
+            padding: 12px 15px;
+            background: white;
+            color: #333;
+        }
+        .dark-mode .form-control {
+            background: #1a1a2e;
+            border-color: #404040;
+            color: white;
+        }
+        .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+        .btn-submit {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 10px;
+            padding: 12px 30px;
+            font-weight: 600;
+            color: white;
+            width: 100%;
+            margin-top: 15px;
+        }
+        .btn-submit:hover {
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+    </style>
+</head>
+<body>
+
+<!-- Navigation -->
+<nav class="navbar navbar-expand-lg navbar-custom">
+    <div class="container">
+        <a class="navbar-brand" href="/"><i class="fas fa-university"></i> SmartBank</a>
+        <span class="navbar-text">Savings Goals</span>
+        <div style="margin-left: auto; display: flex; align-items: center;">
+            <div id="currentTime" class="text-white me-3" style="font-size: 0.9rem; font-weight: 500;"></div>
+            <button class="btn btn-sm" style="background: rgba(255,255,255,0.2); border: 1px solid white; color: white; border-radius: 20px; padding: 8px 15px;" onclick="toggleDarkMode()">
+                <i class="fas fa-moon"></i> Dark Mode
+            </button>
+        </div>
+    </div>
+</nav>
+
+<div class="container" style="max-width: 1000px;">
+    <a href="/dashboard" class="back-btn"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
+
+    <h2 class="page-header"><i class="fas fa-target"></i> Your Savings Goals</h2>
+
+    <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert" style="margin-bottom: 20px;">
+        <strong>Success:</strong> <span th:text="${successMessage}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert" style="margin-bottom: 20px;">
+        <strong>Error:</strong> <span th:text="${errorMessage}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
+    <div th:if="${goals.size() > 0}">
+        <div th:each="goal : ${goals}" class="goal-card">
+            <div class="goal-title">
+                <div class="goal-icon icon-house" th:classappend="${goal.category == 'Travel' ? ' icon-travel' : goal.category == 'Education' ? ' icon-education' : goal.category == 'Vehicle' ? ' icon-car' : goal.category == 'Home' ? ' icon-house' : ' icon-house'}">
+                    <i class="fas fa-bullseye"></i>
+                </div>
+                <span th:text="${goal.name}">Goal Name</span>
+            </div>
+
+            <div class="goal-info">
+                <div class="info-item">
+                    <div class="info-label">Target Amount</div>
+                    <div class="info-value">$<span th:text="${#numbers.formatDecimal(goal.targetAmount, 0, 2)}">0</span></div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Saved So Far</div>
+                    <div class="info-value">$<span th:text="${#numbers.formatDecimal(goal.currentAmount, 0, 2)}">0</span></div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Remaining</div>
+                    <div class="info-value">$<span th:text="${#numbers.formatDecimal(goal.remainingAmount, 0, 2)}">0</span></div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Target Date</div>
+                    <div class="info-value" th:text="${goal.targetDate}">Target Date</div>
+                </div>
+            </div>
+
+            <div class="progress-container">
+                <div class="progress-bar-custom" th:style="${'width:' + goal.completionPercent + '%;'}"></div>
+            </div>
+            <div class="progress-percent" th:text="${goal.completionPercent + '% Complete'}">0% Complete</div>
+
+            <div class="action-buttons">
+                <button class="action-btn" onclick="alert('Add funds functionality coming soon!')"><i class="fas fa-plus"></i> Add Funds</button>
+                <button class="action-btn" onclick="alert('Edit goal functionality coming soon!')"><i class="fas fa-edit"></i> Edit Goal</button>
+            </div>
+        </div>
+    </div>
+    <div th:unless="${goals.size() > 0}" class="goal-card" style="text-align: center;">
+        <div class="goal-title">
+            <div class="goal-icon icon-house">
+                <i class="fas fa-heart"></i>
+            </div>
+            No savings goals created yet
+        </div>
+        <p style="color: #555; margin-top: 20px;">Create a goal below to start tracking your savings journey.</p>
+    </div>
+
+    <!-- Create New Goal -->
+    <h3 class="page-header"><i class="fas fa-plus-circle"></i> Create New Savings Goal</h3>
+    <div class="form-card">
+        <h4>Set Your Goal</h4>
+        <form action="/createGoal" method="post">
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="goalName" class="form-label">Goal Name</label>
+                    <input type="text" class="form-control" id="goalName" name="goalName" placeholder="e.g., Home Down Payment" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="goalCategory" class="form-label">Category</label>
+                    <select class="form-control" id="goalCategory" name="goalCategory" required>
+                        <option value="Travel">Travel 🌍</option>
+                        <option value="Education">Education 🎓</option>
+                        <option value="Vehicle">Vehicle 🚗</option>
+                        <option value="Home">Home 🏠</option>
+                        <option value="Retirement">Retirement 🏖️</option>
+                        <option value="Wedding">Wedding 💍</option>
+                        <option value="Business">Business 💼</option>
+                        <option value="Other">Other 📌</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="targetAmount" class="form-label">Target Amount ($)</label>
+                    <input type="number" class="form-control" id="targetAmount" name="targetAmount" placeholder="10000" step="100" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="targetDate" class="form-label">Target Date</label>
+                    <input type="date" class="form-control" id="targetDate" name="targetDate" required>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label for="currentAmount" class="form-label">Current Savings ($)</label>
+                <input type="number" class="form-control" id="currentAmount" name="currentAmount" placeholder="0" step="100" value="0">
+            </div>
+
+            <button type="submit" class="btn-submit">
+                <i class="fas fa-check-circle"></i> Create Goal
+            </button>
+        </form>
+    </div>
+</div>
+
+<script>
+    function toggleDarkMode() {
+        document.body.classList.toggle('dark-mode');
+        localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
+    }
+
+    // Load dark mode preference
+    if (localStorage.getItem('darkMode') === 'true') {
+        document.body.classList.add('dark-mode');
+    }
+
+    // Update time every second
+    function updateTime() {
+        const now = new Date();
+        const timeString = now.toLocaleTimeString('en-US', { 
+            hour: '2-digit', 
+            minute: '2-digit', 
+            second: '2-digit',
+            hour12: true 
+        });
+        const dayString = now.toLocaleDateString('en-US', { 
+            weekday: 'long', 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric' 
+        });
+        document.getElementById('currentTime').textContent = timeString + ' | ' + dayString;
+    }
+    updateTime();
+    setInterval(updateTime, 1000);
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

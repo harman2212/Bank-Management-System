@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Loan Calculator - Smart Bank</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Color+Emoji&display=swap" rel="stylesheet">
+    <style>
+        * {
+            font-family: 'Segoe UI', 'Noto Color Emoji', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            transition: background 0.3s ease;
+        }
+        body.dark-mode {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        }
+        .navbar-custom {
+            background: rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .navbar-brand {
+            color: white !important;
+            font-weight: 700;
+            font-size: 1.5rem;
+        }
+        .back-btn {
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+        .back-btn:hover { color: #f0f0f0; }
+        .calculator-container {
+            max-width: 800px;
+            margin: 30px auto 0;
+        }
+        .calculator-card {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .dark-mode .calculator-card {
+            background: #2d2d44;
+            color: white;
+        }
+        .calculator-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        .dark-mode .calculator-header {
+            border-bottom-color: #404040;
+        }
+        .calculator-header h2 {
+            color: #667eea;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        .form-group { margin-bottom: 25px; }
+        .form-label {
+            color: #333;
+            font-weight: 700;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .dark-mode .form-label { color: white; }
+        .form-label span {
+            color: #667eea;
+            font-size: 1.1rem;
+        }
+        .form-control {
+            border-radius: 10px;
+            border: 2px solid #e0e0e0;
+            padding: 12px 15px;
+            font-size: 1rem;
+            background: white;
+            color: #333;
+            transition: all 0.3s ease;
+        }
+        .dark-mode .form-control {
+            background: #1a1a2e;
+            border-color: #404040;
+            color: white;
+        }
+        .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+            outline: none;
+        }
+        input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 8px;
+            border-radius: 5px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            outline: none;
+            border: none !important;
+            padding: 0 !important;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: white;
+            border: 3px solid #667eea;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        input[type="range"]::-moz-range-thumb {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: white;
+            border: 3px solid #667eea;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        .results-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-top: 30px;
+        }
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+        }
+        .result-item:last-child { border-bottom: none; }
+        .result-label { font-size: 1rem; opacity: 0.9; }
+        .result-value { font-size: 1.3rem; font-weight: 700; }
+        .highlight-result {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            text-align: center;
+        }
+        .highlight-result .result-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        .highlight-result .result-value {
+            font-size: 2.5rem;
+            margin-top: 10px;
+        }
+        .loan-type-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+        .loan-type-btn {
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            background: white;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            color: #333;
+        }
+        .dark-mode .loan-type-btn {
+            background: #1a1a2e;
+            border-color: #404040;
+            color: white;
+        }
+        .loan-type-btn:hover,
+        .loan-type-btn.active {
+            border-color: #667eea;
+            background: #f8f9ff;
+            color: #667eea;
+        }
+        .dark-mode .loan-type-btn:hover,
+        .dark-mode .loan-type-btn.active {
+            background: #667eea;
+            color: white;
+        }
+        .loan-type-btn i { font-size: 1.5rem; display: block; margin-bottom: 8px; }
+    </style>
+</head>
+<body>
+
+<!-- Navigation -->
+<nav class="navbar navbar-expand-lg navbar-custom">
+    <div class="container">
+        <a class="navbar-brand" href="/"><i class="fas fa-university"></i> SmartBank</a>
+        <span class="navbar-text text-white">Loan Calculator</span>
+        <div style="margin-left: auto; display: flex; align-items: center;">
+            <div id="currentTime" class="text-white me-3" style="font-size: 0.9rem; font-weight: 500;"></div>
+            <button class="btn btn-sm" style="background: rgba(255,255,255,0.2); border: 1px solid white; color: white; border-radius: 20px; padding: 8px 15px;" onclick="toggleDarkMode()">
+                <i class="fas fa-moon"></i> Dark Mode
+            </button>
+        </div>
+    </div>
+</nav>
+
+<div class="calculator-container">
+    <a href="/dashboard" class="back-btn"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
+
+    <div class="calculator-card">
+        <div class="calculator-header">
+            <h2><i class="fas fa-calculator"></i> Loan Calculator</h2>
+            <p class="text-muted">Calculate your monthly loan payment</p>
+        </div>
+
+        <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert" style="margin-bottom: 20px;">
+            <strong>Success:</strong> <span th:text="${successMessage}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert" style="margin-bottom: 20px;">
+            <strong>Error:</strong> <span th:text="${errorMessage}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
+        <form id="loanForm" action="/applyLoan" method="post">
+            <input type="hidden" id="selectedLoanType" name="loanType" value="Home Loan">
+            <div class="form-group">
+                <label class="form-label">Full Name</label>
+                <input type="text" class="form-control" name="name" placeholder="Your Name" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Email Address</label>
+                <input type="email" class="form-control" name="email" placeholder="you@example.com" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Phone Number</label>
+                <input type="tel" class="form-control" name="phone" placeholder="1234567890" pattern="\d{10}" maxlength="10" required title="Enter exactly 10 digits">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">
+                    Loan Amount
+                    <span id="loanAmountValue">$100,000</span>
+                </label>
+                <input type="range" id="loanAmount" name="loanAmount" min="10000" max="1000000" step="10000" value="100000" oninput="calculateLoan()">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">
+                    Interest Rate (%)
+                    <span id="interestRateValue">5.5%</span>
+                </label>
+                <input type="range" id="interestRate" name="interestRate" min="1" max="20" step="0.1" value="5.5" oninput="calculateLoan()">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">
+                    Loan Term (Years)
+                    <span id="loanTermValue">30</span>
+                </label>
+                <input type="range" id="loanTerm" name="loanTerm" min="1" max="40" step="1" value="30" oninput="calculateLoan()">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Loan Type</label>
+                <div class="loan-type-grid">
+                    <div class="loan-type-btn active" onclick="selectLoanType(this, 5.5, 'Home Loan')">
+                        <i class="fas fa-home"></i> Home Loan
+                    </div>
+                    <div class="loan-type-btn" onclick="selectLoanType(this, 7.5, 'Auto Loan')">
+                        <i class="fas fa-car"></i> Auto Loan
+                    </div>
+                    <div class="loan-type-btn" onclick="selectLoanType(this, 12.0, 'Personal Loan')">
+                        <i class="fas fa-user"></i> Personal Loan
+                    </div>
+                    <div class="loan-type-btn" onclick="selectLoanType(this, 8.0, 'Business Loan')">
+                        <i class="fas fa-briefcase"></i> Business Loan
+                    </div>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-light btn-lg mt-4" style="width: 100%; font-weight: 600; color: #667eea;">
+                <i class="fas fa-check-circle"></i> Apply for Loan
+            </button>
+        </form>
+
+        <div class="results-section">
+            <div class="result-item">
+                <div class="result-label"><i class="fas fa-dollar-sign"></i> Monthly Payment</div>
+                <div class="result-value" id="monthlyPayment">$567.89</div>
+            </div>
+            <div class="result-item">
+                <div class="result-label"><i class="fas fa-coins"></i> Total Interest</div>
+                <div class="result-value" id="totalInterest">$104,438</div>
+            </div>
+            <div class="result-item">
+                <div class="result-label"><i class="fas fa-money-bill-wave"></i> Total Amount Payable</div>
+                <div class="result-value" id="totalAmount">$204,438</div>
+            </div>
+            <div class="highlight-result">
+                <div class="result-label">Over the loan period, you'll pay</div>
+                <div class="result-value" id="highlightAmount">$104,438</div>
+                <div class="result-label" style="margin-top: 5px;">in interest</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Dark Mode
+    function toggleDarkMode() {
+        document.body.classList.toggle('dark-mode');
+        localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
+    }
+    if (localStorage.getItem('darkMode') === 'true') {
+        document.body.classList.add('dark-mode');
+    }
+
+    // Loan Type Selection
+    function selectLoanType(el, rate, type) {
+        document.querySelectorAll('.loan-type-btn').forEach(b => b.classList.remove('active'));
+        el.classList.add('active');
+        document.getElementById('interestRate').value = rate;
+        document.getElementById('selectedLoanType').value = type;
+        calculateLoan();
+    }
+
+    // Loan Calculation
+    function calculateLoan() {
+        const principal = parseFloat(document.getElementById('loanAmount').value);
+        const rate = parseFloat(document.getElementById('interestRate').value) / 100 / 12;
+        const months = parseInt(document.getElementById('loanTerm').value) * 12;
+
+        document.getElementById('loanAmountValue').textContent = '$' + principal.toLocaleString();
+        document.getElementById('interestRateValue').textContent = parseFloat(document.getElementById('interestRate').value).toFixed(1) + '%';
+        document.getElementById('loanTermValue').textContent = document.getElementById('loanTerm').value;
+
+        const monthlyPayment = (principal * rate * Math.pow(1 + rate, months)) / (Math.pow(1 + rate, months) - 1);
+        const totalAmount = monthlyPayment * months;
+        const totalInterest = totalAmount - principal;
+
+        document.getElementById('monthlyPayment').textContent = '$' + monthlyPayment.toFixed(2);
+        document.getElementById('totalInterest').textContent = '$' + totalInterest.toLocaleString('en-US', { maximumFractionDigits: 0 });
+        document.getElementById('totalAmount').textContent = '$' + totalAmount.toLocaleString('en-US', { maximumFractionDigits: 0 });
+        document.getElementById('highlightAmount').textContent = '$' + totalInterest.toLocaleString('en-US', { maximumFractionDigits: 0 });
+    }
+
+    calculateLoan();
+</script>
+
+<script>
+    // Update time every second
+    function updateTime() {
+        const now = new Date();
+        const timeString = now.toLocaleTimeString('en-US', { 
+            hour: '2-digit', 
+            minute: '2-digit', 
+            second: '2-digit',
+            hour12: true 
+        });
+        const dayString = now.toLocaleDateString('en-US', { 
+            weekday: 'long', 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric' 
+        });
+        document.getElementById('currentTime').textContent = timeString + ' | ' + dayString;
+    }
+    updateTime();
+    setInterval(updateTime, 1000);
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

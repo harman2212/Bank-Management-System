@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Analytics - Smart Bank</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Color+Emoji&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        * {
+            font-family: 'Segoe UI', 'Noto Color Emoji', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            transition: background 0.3s ease;
+        }
+        body.dark-mode {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        }
+        .navbar-custom {
+            background: rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: white !important;
+        }
+        .container {
+            max-width: 1200px;
+        }
+        .page-header {
+            color: white;
+            margin: 30px 0 20px 0;
+        }
+        .back-btn {
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+        .back-btn:hover {
+            color: #f0f0f0;
+        }
+        .analytics-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 25px;
+        }
+        .dark-mode .analytics-card {
+            background: #2d2d44;
+            color: white;
+        }
+        .chart-container {
+            position: relative;
+            height: 400px;
+            margin-bottom: 20px;
+        }
+        .metric-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .metric-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+        }
+        .metric-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 10px 0;
+        }
+        .metric-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        .dark-mode table {
+            color: white;
+        }
+        .dark-mode tbody tr {
+            border-bottom: 1px solid #404040;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Navigation -->
+<nav class="navbar navbar-expand-lg navbar-custom">
+    <div class="container">
+        <a class="navbar-brand" href="/"><i class="fas fa-university"></i> SmartBank</a>
+        <span class="navbar-text text-white">Analytics Dashboard</span>
+        <div style="margin-left: auto;">
+            <button class="btn btn-sm" style="background: rgba(255,255,255,0.2); border: 1px solid white; color: white; border-radius: 20px; padding: 8px 15px;" onclick="toggleDarkMode()">
+                <i class="fas fa-moon"></i> Dark Mode
+            </button>
+        </div>
+    </div>
+</nav>
+
+<div class="container">
+    <a href="/dashboard" class="back-btn"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
+
+    <h2 class="page-header"><i class="fas fa-chart-line"></i> Analytics & Reports 📊</h2>
+
+    <!-- Key Metrics -->
+    <div class="metric-grid">
+        <div class="metric-box">
+            <div class="metric-label">👥 Total Customers</div>
+            <div class="metric-value" th:text="${totalCustomers}">0</div>
+        </div>
+        <div class="metric-box">
+            <div class="metric-label">💳 Active Accounts</div>
+            <div class="metric-value" th:text="${totalAccounts}">0</div>
+        </div>
+        <div class="metric-box">
+            <div class="metric-label">💰 Total Balance</div>
+            <div class="metric-value">$<span th:text="${#numbers.formatDecimal(totalBalance, 1, 2)}">0.00</span></div>
+        </div>
+        <div class="metric-box">
+            <div class="metric-label">📈 Transactions</div>
+            <div class="metric-value" th:text="${totalTransactions}">0</div>
+        </div>
+    </div>
+
+    <!-- Charts Row 1 -->
+    <div class="row">
+        <div class="col-lg-6">
+            <div class="analytics-card">
+                <h5 style="color: #667eea; margin-bottom: 20px;"><i class="fas fa-chart-pie"></i> Account Distribution</h5>
+                <div class="chart-container">
+                    <canvas id="accountChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="analytics-card">
+                <h5 style="color: #667eea; margin-bottom: 20px;"><i class="fas fa-chart-bar"></i> Monthly Transactions 📉</h5>
+                <div class="chart-container">
+                    <canvas id="transactionChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Row 2 -->
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="analytics-card">
+                <h5 style="color: #667eea; margin-bottom: 20px;"><i class="fas fa-chart-line"></i> Balance Trends 📈</h5>
+                <div class="chart-container">
+                    <canvas id="balanceChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Summary Tables -->
+    <div class="row">
+        <div class="col-lg-6">
+            <div class="analytics-card">
+                <h5 style="color: #667eea; margin-bottom: 20px;"><i class="fas fa-crown"></i> Top Customers 🏆</h5>
+                <table class="table table-sm">
+                    <thead>
+                        <tr style="background: #f8f9ff;">
+                            <th>Name</th>
+                            <th>Balance</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>🧑 John Smith</td><td>$45,230</td></tr>
+                        <tr><td>👩 Sarah Johnson</td><td>$38,950</td></tr>
+                        <tr><td>👨 Mike Chen</td><td>$35,680</td></tr>
+                        <tr><td>👰 Emma Williams</td><td>$32,450</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="analytics-card">
+                <h5 style="color: #667eea; margin-bottom: 20px;"><i class="fas fa-exchange-alt"></i> Recent Large Transfers 💸</h5>
+                <table class="table table-sm">
+                    <thead>
+                        <tr style="background: #f8f9ff;">
+                            <th>Type</th>
+                            <th>Amount</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>↔️ Transfer</td><td>$5,000</td><td>Today</td></tr>
+                        <tr><td>⬆️ Deposit</td><td>$3,500</td><td>Today</td></tr>
+                        <tr><td>↔️ Transfer</td><td>$2,800</td><td>Yesterday</td></tr>
+                        <tr><td>⬇️ Withdrawal</td><td>$2,000</td><td>Yesterday</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Dark Mode Toggle
+    function toggleDarkMode() {
+        document.body.classList.toggle('dark-mode');
+        localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
+    }
+
+    // Load dark mode preference
+    if (localStorage.getItem('darkMode') === 'true') {
+        document.body.classList.add('dark-mode');
+    }
+
+    // Account Distribution Chart
+    const accountCtx = document.getElementById('accountChart').getContext('2d');
+    new Chart(accountCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Checking Accounts', 'Savings Accounts', 'Money Market'],
+            datasets: [{
+                data: [45, 35, 20],
+                backgroundColor: ['#667eea', '#764ba2', '#f59e0b']
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false
+        }
+    });
+
+    // Monthly Transactions Chart
+    const transCtx = document.getElementById('transactionChart').getContext('2d');
+    new Chart(transCtx, {
+        type: 'bar',
+        data: {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+            datasets: [{
+                label: 'Transactions',
+                data: [45, 52, 48, 61, 55, 67],
+                backgroundColor: '#667eea'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    // Balance Trends Chart
+    const balanceCtx = document.getElementById('balanceChart').getContext('2d');
+    new Chart(balanceCtx, {
+        type: 'line',
+        data: {
+            labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6'],
+            datasets: [{
+                label: 'Total Balance',
+                data: [1200, 1400, 1300, 1600, 1800, 2100],
+                borderColor: '#667eea',
+                backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                borderWidth: 3,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

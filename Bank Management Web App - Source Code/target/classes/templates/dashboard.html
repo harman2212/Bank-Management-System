@@ -1,0 +1,1132 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Dashboard - Smart Bank</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            font-family: 'Segoe UI', 'Noto Color Emoji', Tahoma, Geneva, Verdana, sans-serif;
+            transition: background 0.3s ease;
+        }
+        body.dark-mode {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        }
+        .navbar-custom {
+            background: rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: white !important;
+        }
+        .container-fluid {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .stat-card {
+            background: rgba(255,255,255,0.95);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            text-align: center;
+            margin-bottom: 20px;
+            transition: transform 0.3s ease;
+        }
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+        }
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #667eea;
+            margin: 10px 0;
+        }
+        .stat-label {
+            font-size: 1rem;
+            color: #666;
+            font-weight: 500;
+        }
+        .section-title {
+            color: white;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 30px;
+            margin-top: 30px;
+        }
+        .form-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .form-card h4 {
+            color: #667eea;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+        .dark-mode .form-card {
+            background: #2d2d44;
+            color: white;
+        }
+        .dark-mode .form-card h4 {
+            color: #667eea;
+        }
+        .form-control {
+            border-radius: 10px;
+            border: 2px solid #e0e0e0;
+            padding: 12px 15px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: white;
+            color: #333;
+        }
+        .dark-mode .form-control {
+            background: #1a1a2e;
+            border-color: #404040;
+            color: white;
+        }
+        .dark-mode .form-control::placeholder {
+            color: #cccccc;
+        }
+        .dark-mode .stat-card {
+            background: #2d2d44;
+            color: white;
+        }
+        .dark-mode .customer-card {
+            background: #2d2d44;
+            color: white;
+        }
+        .dark-mode .section-title {
+            color: white;
+        }
+        .btn-primary-custom {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 10px;
+            padding: 12px 30px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .btn-primary-custom:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+        .customer-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+            margin-top: 20px;
+        }
+        .customer-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            border-left: 5px solid #28a745;
+        }
+        .customer-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 40px rgba(40, 167, 69, 0.3);
+            border-left-color: #218838;
+        }
+        .show-more-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 40px rgba(40, 167, 69, 0.3);
+            border-left-color: #218838;
+        }
+        .show-more-card:hover .customer-name {
+            color: #218838 !important;
+        }
+        .customer-name {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .dark-mode .customer-name {
+            color: white;
+        }
+        .customer-info {
+            color: #666;
+            font-size: 0.95rem;
+            margin-bottom: 8px;
+            line-height: 1.6;
+        }
+        .customer-info i {
+            color: #667eea;
+            width: 20px;
+            margin-right: 8px;
+        }
+        .btn-view {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white !important;
+            border-radius: 8px;
+            padding: 10px 20px;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 15px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .btn-view:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: white;
+        }
+        .empty-state i {
+            font-size: 4rem;
+            opacity: 0.5;
+            margin-bottom: 20px;
+        }
+        .quick-actions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 15px;
+            margin-bottom: 40px;
+        }
+        .quick-action-btn {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 20px 15px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            color: #333;
+            font-weight: 600;
+            text-decoration: none;
+        }
+        .quick-action-btn:hover {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: transparent;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+        .quick-action-btn i {
+            font-size: 1.8rem;
+        }
+
+    </style>
+</head>
+<body>
+
+<!-- Navigation -->
+<nav class="navbar navbar-expand-lg navbar-custom">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="/"><i class="fas fa-university"></i> SmartBank</a>
+        <span class="navbar-text text-white">Admin Dashboard</span>
+        <div style="margin-left: auto; display: flex; align-items: center;">
+            <div id="currentTime" class="text-white me-3" style="font-size: 0.9rem; font-weight: 500;"></div>
+            <button class="btn btn-sm" style="background: rgba(255,255,255,0.2); border: 1px solid white; color: white; border-radius: 20px; padding: 8px 15px;" onclick="toggleDarkMode()">
+                <i class="fas fa-moon"></i> Dark Mode
+            </button>
+        </div>
+    </div>
+</nav>
+
+<div class="container-fluid">
+    <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert" style="margin-bottom: 20px;">
+        <strong>Success:</strong> <span th:text="${successMessage}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert" style="margin-bottom: 20px;">
+        <strong>Error:</strong> <span th:text="${errorMessage}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    <!-- Quick Actions Section -->
+    <h3 class="section-title" style="margin-top: 0;">Quick Actions</h3>
+    <div class="quick-actions-grid">
+        <button class="quick-action-btn" data-bs-toggle="modal" data-bs-target="#customerModal">
+            <i class="fas fa-user-plus" style="font-size: 1.8rem;"></i>
+            <span>Add Customer</span>
+        </button>
+        <button class="quick-action-btn" data-bs-toggle="modal" data-bs-target="#accountModal">
+            <i class="fas fa-credit-card" style="font-size: 1.8rem;"></i>
+            <span>Add Account</span>
+        </button>
+        <a href="#customers" class="quick-action-btn" style="text-decoration: none; color: inherit;">
+            <i class="fas fa-users" style="font-size: 1.8rem;"></i>
+            <span>View Customers</span>
+        </a>
+        <a href="/loan-calculator" class="quick-action-btn" style="text-decoration: none; color: inherit;">
+            <i class="fas fa-calculator" style="font-size: 1.8rem;"></i>
+            <span>Loan Calculator</span>
+        </a>
+        <a href="/savings-goals" class="quick-action-btn" style="text-decoration: none; color: inherit;">
+            <i class="fas fa-piggy-bank" style="font-size: 1.8rem;"></i>
+            <span>Savings Goals</span>
+        </a>
+        <a href="/analytics" class="quick-action-btn" style="text-decoration: none; color: inherit;">
+            <i class="fas fa-chart-pie" style="font-size: 1.8rem;"></i>
+            <span>Analytics</span>
+        </a>
+        <button class="quick-action-btn" data-bs-toggle="modal" data-bs-target="#settingsModal">
+            <i class="fas fa-cog" style="font-size: 1.8rem;"></i>
+            <span>Settings</span>
+        </button>
+    </div>
+
+    <!-- Recent Activity Box -->
+    <div class="stats-section" style="margin-top: 20px;">
+        <div class="row">
+            <div class="col-12">
+                <div class="stat-card" style="text-align: left;">
+                    <h4 style="margin-bottom: 15px; color: #667eea;">Recent Activity</h4>
+                    <ul class="list-group" style="background: transparent; border: none; max-height: 200px; overflow-y: auto;">
+                        <li class="list-group-item" th:if="${recentActivities.size() == 0}" style="background: rgba(255,255,255,0.9); border: none;">No activity yet.</li>
+                        <li class="list-group-item" th:each="activity : ${recentActivities}" style="background: rgba(255,255,255,0.9); border: none;">• <span th:text="${activity}">Activity item</span></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Section -->
+    <div class="stats-section">
+        <div class="row">
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <i class="fas fa-users" style="font-size: 2.5rem; color: #667eea; margin-bottom: 10px;"></i>
+                    <div class="stat-label">Total Customers</div>
+                    <div class="stat-number" th:text="${totalCustomers}">0</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <i class="fas fa-wallet" style="font-size: 2.5rem; color: #f59e0b; margin-bottom: 10px;"></i>
+                    <div class="stat-label">Total Accounts</div>
+                    <div class="stat-number" th:text="${totalAccounts}">0</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <i class="fas fa-dollar-sign" style="font-size: 2.5rem; color: #10b981; margin-bottom: 10px;"></i>
+                    <div class="stat-label">Total Balance</div>
+                    <div class="stat-number">$<span th:text="${#numbers.formatDecimal(totalBalance, 1, 2)}">0.00</span></div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <i class="fas fa-chart-line" style="font-size: 2.5rem; color: #8b5cf6; margin-bottom: 10px;"></i>
+                    <div class="stat-label">Transactions</div>
+                    <div class="stat-number" th:text="${totalTransactions}">0</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Analytics Widgets Section - Collapsible -->
+    <div class="analytics-section">
+        <div class="d-flex justify-content-between align-items-center" style="margin-bottom: 20px;">
+            <h3 class="section-title" style="margin-bottom: 0;">Analytics Overview</h3>
+            <button class="btn btn-sm" style="background: rgba(255,255,255,0.2); border: 1px solid white; color: white; border-radius: 20px; padding: 8px 15px;" onclick="toggleAnalytics()">
+                <i class="fas fa-chart-bar"></i> <span id="analyticsToggleText">Show Analytics</span>
+            </button>
+        </div>
+        <div id="analyticsContent" style="display: none;">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="stat-card" style="padding: 15px;">
+                        <h6 style="color: #667eea; margin-bottom: 10px;"><i class="fas fa-chart-pie"></i> Account Types</h6>
+                        <canvas id="accountTypesChart" width="300" height="200"></canvas>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="stat-card" style="padding: 15px;">
+                        <h6 style="color: #667eea; margin-bottom: 10px;"><i class="fas fa-chart-bar"></i> Balance Ranges</h6>
+                        <canvas id="balanceRangesChart" width="300" height="200"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="row" style="margin-top: 15px;">
+                <div class="col-md-6">
+                    <div class="stat-card" style="padding: 15px;">
+                        <h6 style="color: #667eea; margin-bottom: 10px;"><i class="fas fa-trophy"></i> Top Customers</h6>
+                        <canvas id="topCustomersChart" width="300" height="200"></canvas>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="stat-card" style="padding: 15px;">
+                        <h6 style="color: #667eea; margin-bottom: 10px;"><i class="fas fa-calendar-alt"></i> Monthly Trends</h6>
+                        <canvas id="monthlyTrendsChart" width="300" height="200"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add New Customer Section -->
+    <h3 class="section-title">Add New Customer</h3>
+    <div class="form-card">
+        <h4><i class="fas fa-user-plus"></i> Customer Registration</h4>
+        <form action="/createCustomer" method="post">
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <label for="name" class="form-label fw-600">Full Name</label>
+                    <input type="text" class="form-control" id="name" name="name" placeholder="John Doe" required>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="email" class="form-label fw-600">Email Address</label>
+                    <input type="email" class="form-control" id="email" name="email" placeholder="john@example.com" required>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="phone" class="form-label fw-600">Phone Number</label>
+                    <input type="tel" class="form-control" id="phone" name="phone" placeholder="+1-XXX-XXX-XXXX" required>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary btn-primary-custom">
+                <i class="fas fa-user-plus"></i> Add Customer
+            </button>
+        </form>
+    </div>
+
+    <!-- Customers List Section -->
+    <h3 class="section-title" id="customers">Active Customers</h3>
+    <div class="customer-list" th:if="${customers.size() > 0}">
+        <div class="customer-card" th:each="customer, iterStat : ${customers}" th:if="${iterStat.index < 5}">
+            <div class="customer-name">
+                <i class="fas fa-user-circle"></i> <span th:text="${customer.name}">Customer Name</span>
+            </div>
+            <div class="customer-info">
+                <i class="fas fa-envelope"></i><span th:text="${customer.email}">email@example.com</span>
+            </div>
+            <div class="customer-info">
+                <i class="fas fa-phone"></i><span th:text="${customer.phone}">+1-XXX-XXXX-XXXX</span>
+            </div>
+            <div class="customer-info">
+                <i class="fas fa-wallet"></i><strong>Accounts:</strong> <span th:text="${customer.accounts.size()}">0</span>
+            </div>
+            <div class="customer-info">
+                <i class="fas fa-dollar-sign"></i><strong>Total Balance:</strong> $<span th:text="${#numbers.formatDecimal(customer.totalBalance, 1, 2)}">0.00</span>
+            </div>
+            <a th:href="'/customer/' + ${customer.id}" class="btn-view">
+                <i class="fas fa-arrow-right"></i> View Details
+            </a>
+        </div>
+        <div th:if="${customers.size() > 5}" class="customer-card show-more-card" style="cursor: pointer; text-align: center; border-left-color: #28a745;" onclick="window.location.href='/customers'">
+            <div class="customer-name" style="color: #28a745;">
+                <i class="fas fa-users"></i> Show More Customers
+            </div>
+            <div class="customer-info" style="font-size: 0.9rem; color: #666;">
+                <i class="fas fa-plus-circle"></i> View all <span th:text="${customers.size() - 5}">0</span> additional customers
+            </div>
+            <div style="margin-top: 15px;">
+                <i class="fas fa-arrow-right" style="color: #28a745; font-size: 1.2rem;"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="empty-state" th:unless="${customers.size() > 0}">
+        <i class="fas fa-inbox"></i>
+        <h4>No Customers Yet</h4>
+        <p>Add your first customer using the form above to get started!</p>
+    </div>
+
+    <!-- Reports Section -->
+    <h3 class="section-title" id="reports"><i class="fas fa-chart-pie"></i> System Reports</h3>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="panel-card">
+                <h5 style="color: #667eea; margin-bottom: 15px;"><i class="fas fa-bar-chart"></i> Overview</h5>
+                <div class="info-box" style="margin-bottom: 10px;">
+                    <div class="info-label">Total Customers</div>
+                    <div class="info-value" th:text="${totalCustomers}">0</div>
+                </div>
+                <div class="info-box" style="margin-bottom: 10px;">
+                    <div class="info-label">Total Accounts</div>
+                    <div class="info-value" th:text="${totalAccounts}">0</div>
+                </div>
+                <div class="info-box">
+                    <div class="info-label">System Status</div>
+                    <div class="info-value" style="color: #22c55e;"><i class="fas fa-check-circle"></i> Operational</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="panel-card">
+                <h5 style="color: #667eea; margin-bottom: 15px;"><i class="fas fa-info-circle"></i> System Information</h5>
+                <div class="info-box" style="margin-bottom: 10px;">
+                    <div class="info-label">Application</div>
+                    <div class="info-value">SmartBank v1.0</div>
+                </div>
+                <div class="info-box" style="margin-bottom: 10px;">
+                    <div class="info-label">Database</div>
+                    <div class="info-value">In-Memory</div>
+                </div>
+                <div class="info-box">
+                    <div class="info-label">Last Updated</div>
+                    <div class="info-value">Today</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Customer Modal -->
+<div class="modal fade" id="customerModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content" style="border-radius: 15px; border: none;">
+            <div class="modal-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none;">
+                <h5 class="modal-title"><i class="fas fa-user-plus"></i> Add New Customer</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="/createCustomer" method="post">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="modalName" class="form-label">Full Name</label>
+                        <input type="text" class="form-control" id="modalName" name="name" placeholder="John Doe" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="modalEmail" class="form-label">Email Address</label>
+                        <input type="email" class="form-control" id="modalEmail" name="email" placeholder="john@example.com" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="modalPhone" class="form-label">Phone Number</label>
+                        <input type="tel" class="form-control" id="modalPhone" name="phone" placeholder="+1-XXX-XXX-XXXX" required>
+                    </div>
+                </div>
+                <div class="modal-footer" style="border-top: 1px solid #e0e0e0;">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary-custom">Add Customer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Add Account Modal -->
+<div class="modal fade" id="accountModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content" style="border-radius: 15px; border: none;">
+            <div class="modal-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none;">
+                <h5 class="modal-title"><i class="fas fa-credit-card"></i> Add New Account</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="/createAccountFromDashboard" method="post">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="customerSelect" class="form-label">Select Customer</label>
+                        <select class="form-control" id="customerSelect" name="customerId" required>
+                            <option value="">Choose a customer...</option>
+                            <option th:each="customer : ${customers}" th:value="${customer.id}" th:text="${customer.name}"></option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="accountType" class="form-label">Account Type</label>
+                        <select class="form-control" id="accountType" name="accountType" required>
+                            <option value="Checking">Checking Account</option>
+                            <option value="Savings">Savings Account</option>
+                            <option value="Business">Business Account</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="initialBalance" class="form-label">Initial Balance</label>
+                        <div class="input-group">
+                            <span class="input-group-text">$</span>
+                            <input type="number" class="form-control" id="initialBalance" name="initialBalance" step="0.01" min="0" placeholder="0.00" required>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer" style="border-top: 1px solid #e0e0e0;">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary-custom">Add Account</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Settings Modal -->
+<div class="modal fade" id="settingsModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content" style="border-radius: 15px; border: none;">
+            <div class="modal-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none;">
+                <h5 class="modal-title"><i class="fas fa-cog"></i> Settings</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <h6 style="color: #667eea; margin-bottom: 15px; font-weight: 700;"><i class="fas fa-palette"></i> Appearance</h6>
+
+                <div style="margin-bottom: 15px;">
+                    <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                        <input type="checkbox" id="darkModeToggle" onchange="toggleDarkModeFromSettings()">
+                        <span>Dark Mode</span>
+                    </label>
+                </div>
+
+                <div style="margin-bottom: 15px;">
+                    <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                        <input type="checkbox" checked id="compactViewToggle" onchange="toggleCompactView()">
+                        <span>Compact View (smaller cards)</span>
+                    </label>
+                </div>
+
+                <hr>
+                <h6 style="color: #667eea; margin-bottom: 15px; font-weight: 700;"><i class="fas fa-bell"></i> Notifications</h6>
+
+                <div style="margin-bottom: 15px;">
+                    <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                        <input type="checkbox" checked id="notificationsToggle" onchange="updateSettings()">
+                        <span>Enable Success/Error Alerts</span>
+                    </label>
+                </div>
+
+                <div style="margin-bottom: 15px;">
+                    <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                        <input type="checkbox" checked id="soundToggle" onchange="updateSettings()">
+                        <span>Notification Sound</span>
+                    </label>
+                </div>
+
+                <hr>
+                <h6 style="color: #667eea; margin-bottom: 15px; font-weight: 700;"><i class="fas fa-globe"></i> Preferences</h6>
+
+                <div class="mb-3">
+                    <label for="currency" class="form-label">Default Currency</label>
+                    <select class="form-control" id="currency" onchange="updateCurrency()">
+                        <option value="USD" data-symbol="$" selected>USD ($)</option>
+                        <option value="EUR" data-symbol="€">EUR (€)</option>
+                        <option value="GBP" data-symbol="£">GBP (£)</option>
+                        <option value="INR" data-symbol="₹">INR (₹)</option>
+                        <option value="JPY" data-symbol="¥">JPY (¥)</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label for="dateFormat" class="form-label">Date Format</label>
+                    <select class="form-control" id="dateFormat" onchange="updateSettings()">
+                        <option value="MM/DD/YYYY" selected>MM/DD/YYYY</option>
+                        <option value="DD/MM/YYYY">DD/MM/YYYY</option>
+                        <option value="YYYY-MM-DD">YYYY-MM-DD</option>
+                    </select>
+                </div>
+
+                <hr>
+                <h6 style="color: #667eea; margin-bottom: 15px; font-weight: 700;"><i class="fas fa-database"></i> Data Management</h6>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <button class="btn btn-outline-info btn-sm" onclick="exportData()" style="font-size: 0.85rem;">
+                        <i class="fas fa-download"></i> Export Data
+                    </button>
+                    <button class="btn btn-outline-danger btn-sm" onclick="clearAllData()" style="font-size: 0.85rem;">
+                        <i class="fas fa-trash"></i> Clear All Data
+                    </button>
+                </div>
+            </div>
+            <div class="modal-footer" style="border-top: 1px solid #e0e0e0;">
+                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="resetSettings()">
+                    <i class="fas fa-undo"></i> Reset All
+                </button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary-custom" onclick="saveSettings()">
+                    <i class="fas fa-save"></i> Save
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Toast Notification -->
+<div id="toast" style="position: fixed; top: 20px; right: 20px; z-index: 10000; display: none; min-width: 300px;">
+    <div id="toastContent" style="border-radius: 12px; padding: 16px 20px; color: white; box-shadow: 0 10px 30px rgba(0,0,0,0.2); display: flex; align-items: center; gap: 10px; animation: slideIn 0.3s ease;">
+        <i id="toastIcon" class="fas fa-check-circle" style="font-size: 1.3rem;"></i>
+        <span id="toastMessage">Saved!</span>
+    </div>
+</div>
+
+<style>
+    @keyframes slideIn {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+    }
+    @keyframes slideOut {
+        from { transform: translateX(0); opacity: 1; }
+        to { transform: translateX(100%); opacity: 0; }
+    }
+    .compact-view .stat-card { padding: 15px; }
+    .compact-view .stat-number { font-size: 1.8rem; }
+    .compact-view .customer-card { padding: 15px; }
+    .compact-view .form-card { padding: 20px; }
+    .compact-view .section-title { font-size: 1.5rem; margin-top: 20px; margin-bottom: 20px; }
+</style>
+
+<style>
+    .panel-card {
+        background: white;
+        border-radius: 15px;
+        padding: 25px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+    .info-box {
+        background: #f8f9ff;
+        padding: 15px;
+        border-radius: 10px;
+        border-left: 4px solid #667eea;
+    }
+    .info-label {
+        color: #999;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        font-weight: 600;
+        margin-bottom: 5px;
+    }
+    .info-value {
+        color: #333;
+        font-size: 1.1rem;
+        font-weight: 600;
+    }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Toast Notification System
+    function showToast(message, type) {
+        type = type || 'success';
+        var toast = document.getElementById('toast');
+        var content = document.getElementById('toastContent');
+        var icon = document.getElementById('toastIcon');
+        var msg = document.getElementById('toastMessage');
+
+        msg.textContent = message;
+        if (type === 'success') {
+            content.style.background = 'linear-gradient(135deg, #22c55e, #16a34a)';
+            icon.className = 'fas fa-check-circle';
+        } else if (type === 'error') {
+            content.style.background = 'linear-gradient(135deg, #ef4444, #dc2626)';
+            icon.className = 'fas fa-exclamation-circle';
+        } else if (type === 'info') {
+            content.style.background = 'linear-gradient(135deg, #3b82f6, #2563eb)';
+            icon.className = 'fas fa-info-circle';
+        } else if (type === 'warning') {
+            content.style.background = 'linear-gradient(135deg, #f59e0b, #d97706)';
+            icon.className = 'fas fa-exclamation-triangle';
+        }
+
+        toast.style.display = 'block';
+        content.style.animation = 'slideIn 0.3s ease';
+        setTimeout(function() {
+            content.style.animation = 'slideOut 0.3s ease forwards';
+            setTimeout(function() { toast.style.display = 'none'; }, 300);
+        }, 3000);
+    }
+
+    // Dark Mode
+    function toggleDarkMode() {
+        document.body.classList.toggle('dark-mode');
+        var isDark = document.body.classList.contains('dark-mode');
+        localStorage.setItem('darkMode', isDark);
+        var toggle = document.getElementById('darkModeToggle');
+        if (toggle) toggle.checked = isDark;
+        showToast(isDark ? 'Dark mode enabled' : 'Light mode enabled', 'info');
+    }
+
+    function toggleDarkModeFromSettings() {
+        toggleDarkMode();
+    }
+
+    // Update generic settings
+    function updateSettings() {
+        localStorage.setItem('notifications', document.getElementById('notificationsToggle').checked);
+        localStorage.setItem('sound', document.getElementById('soundToggle').checked);
+        localStorage.setItem('dateFormat', document.getElementById('dateFormat').value);
+        showToast('Settings updated', 'success');
+    }
+
+    // Compact View
+    function toggleCompactView() {
+        document.body.classList.toggle('compact-view');
+        var isCompact = document.body.classList.contains('compact-view');
+        localStorage.setItem('compactView', isCompact);
+        showToast(isCompact ? 'Compact view enabled' : 'Standard view enabled', 'info');
+    }
+
+    // Currency Update
+    function updateCurrency() {
+        var select = document.getElementById('currency');
+        var selected = select.options[select.selectedIndex];
+        var symbol = selected.getAttribute('data-symbol');
+        var currencyName = select.value;
+        localStorage.setItem('currency', currencyName);
+        localStorage.setItem('currencySymbol', symbol);
+
+        // Update dollar signs on the page
+        var currentSymbol = localStorage.getItem('currencySymbol') || '$';
+        document.querySelectorAll('.stat-number').forEach(function(el) {
+            el.innerHTML = el.innerHTML.replace(/[$€£¥₹]/g, currentSymbol);
+        });
+        showToast('Currency changed to ' + currencyName + ' (' + symbol + ')', 'success');
+    }
+
+    // Export Data (download as JSON)
+    function exportData() {
+        var data = {
+            exportDate: new Date().toISOString(),
+            currency: localStorage.getItem('currency') || 'USD',
+            settings: {
+                darkMode: localStorage.getItem('darkMode'),
+                compactView: localStorage.getItem('compactView'),
+                dateFormat: localStorage.getItem('dateFormat'),
+                notifications: localStorage.getItem('notifications')
+            }
+        };
+        var blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.href = url;
+        a.download = 'smartbank-settings-' + new Date().toISOString().slice(0,10) + '.json';
+        a.click();
+        URL.revokeObjectURL(url);
+        showToast('Settings exported successfully!', 'success');
+    }
+
+    // Clear All Data
+    function clearAllData() {
+        if (confirm('Are you sure you want to clear all settings? This cannot be undone.')) {
+            localStorage.clear();
+            showToast('All data cleared. Reloading...', 'warning');
+            setTimeout(function() { location.reload(); }, 1500);
+        }
+    }
+
+    // Save Settings
+    function saveSettings() {
+        var settings = {
+            currency: document.getElementById('currency').value,
+            currencySymbol: document.getElementById('currency').options[document.getElementById('currency').selectedIndex].getAttribute('data-symbol'),
+            dateFormat: document.getElementById('dateFormat').value,
+            notifications: document.getElementById('notificationsToggle').checked,
+            sound: document.getElementById('soundToggle').checked,
+            compactView: document.getElementById('compactViewToggle').checked
+        };
+
+        Object.keys(settings).forEach(function(key) {
+            localStorage.setItem(key, settings[key]);
+        });
+
+        showToast('Settings saved successfully!', 'success');
+
+        var modal = bootstrap.Modal.getInstance(document.getElementById('settingsModal'));
+        if (modal) setTimeout(function() { modal.hide(); }, 500);
+    }
+
+    // Reset Settings
+    function resetSettings() {
+        if (confirm('Reset all settings to defaults?')) {
+            localStorage.clear();
+            document.body.classList.remove('dark-mode');
+            document.body.classList.remove('compact-view');
+            showToast('Settings reset to defaults', 'info');
+            setTimeout(function() { location.reload(); }, 1000);
+        }
+    }
+
+    // Load Preferences on Page Load
+    window.addEventListener('load', function() {
+        // Dark mode
+        if (localStorage.getItem('darkMode') === 'true') {
+            document.body.classList.add('dark-mode');
+            var dt = document.getElementById('darkModeToggle');
+            if (dt) dt.checked = true;
+        }
+
+        // Compact view
+        if (localStorage.getItem('compactView') === 'true') {
+            document.body.classList.add('compact-view');
+            var cv = document.getElementById('compactViewToggle');
+            if (cv) cv.checked = true;
+        }
+
+        // Analytics visibility
+        if (localStorage.getItem('analyticsVisible') === 'true') {
+            document.getElementById('analyticsContent').style.display = 'block';
+            document.getElementById('analyticsToggleText').textContent = 'Hide Analytics';
+            initializeCharts();
+            window.chartsInitialized = true;
+        }
+
+        // Currency
+        var savedCurrency = localStorage.getItem('currency');
+        if (savedCurrency && document.getElementById('currency')) {
+            var sel = document.getElementById('currency');
+            for (var i = 0; i < sel.options.length; i++) {
+                if (sel.options[i].value === savedCurrency) {
+                    sel.selectedIndex = i;
+                    break;
+                }
+            }
+        }
+
+        // Date format
+        var savedDateFormat = localStorage.getItem('dateFormat');
+        if (savedDateFormat && document.getElementById('dateFormat')) {
+            document.getElementById('dateFormat').value = savedDateFormat;
+        }
+
+        // Notifications
+        if (localStorage.getItem('notifications') === 'false') {
+            var nt = document.getElementById('notificationsToggle');
+            if (nt) nt.checked = false;
+        }
+
+        // Sound
+        if (localStorage.getItem('sound') === 'false') {
+            var st = document.getElementById('soundToggle');
+            if (st) st.checked = false;
+        }
+
+        // Replace currency symbols on page
+        var savedSymbol = localStorage.getItem('currencySymbol');
+        if (savedSymbol && savedSymbol !== '$') {
+            document.querySelectorAll('.stat-number').forEach(function(el) {
+                el.innerHTML = el.innerHTML.replace(/\$/g, savedSymbol);
+            });
+        }
+
+        // Auto-show welcome toast
+        showToast('Welcome to SmartBank!', 'info');
+
+        // Update time every second
+        updateTime();
+        setInterval(updateTime, 1000);
+    });
+
+    function updateTime() {
+        const now = new Date();
+        const timeString = now.toLocaleTimeString('en-US', { 
+            hour: '2-digit', 
+            minute: '2-digit', 
+            second: '2-digit',
+            hour12: true 
+        });
+        const dayString = now.toLocaleDateString('en-US', { 
+            weekday: 'long', 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric' 
+        });
+        document.getElementById('currentTime').textContent = timeString + ' | ' + dayString;
+    }
+
+    // Toggle Analytics Section
+    function toggleAnalytics() {
+        const content = document.getElementById('analyticsContent');
+        const toggleText = document.getElementById('analyticsToggleText');
+        const isVisible = content.style.display !== 'none';
+        
+        if (isVisible) {
+            content.style.display = 'none';
+            toggleText.textContent = 'Show Analytics';
+            showToast('Analytics hidden', 'info');
+            localStorage.setItem('analyticsVisible', 'false');
+        } else {
+            content.style.display = 'block';
+            toggleText.textContent = 'Hide Analytics';
+            // Initialize charts if not already done
+            if (!window.chartsInitialized) {
+                initializeCharts();
+                window.chartsInitialized = true;
+            }
+            showToast('Analytics shown', 'info');
+            localStorage.setItem('analyticsVisible', 'true');
+        }
+    }
+
+    // Initialize Charts
+    function initializeCharts() {
+        // Account Types Distribution Chart
+        const accountTypesCtx = document.getElementById('accountTypesChart').getContext('2d');
+        const accountTypesData = /*[[${accountTypeCounts}]]*/ {};
+        const accountTypesLabels = Object.keys(accountTypesData);
+        const accountTypesValues = Object.values(accountTypesData);
+
+        if (accountTypesLabels.length > 0) {
+            new Chart(accountTypesCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: accountTypesLabels,
+                    datasets: [{
+                        data: accountTypesValues,
+                        backgroundColor: [
+                            '#667eea',
+                            '#764ba2',
+                            '#f093fb',
+                            '#f5576c',
+                            '#4facfe',
+                            '#00f2fe'
+                        ],
+                        borderWidth: 2,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 20,
+                                usePointStyle: true
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Balance Ranges Chart
+        const balanceRangesCtx = document.getElementById('balanceRangesChart').getContext('2d');
+        const balanceRangesData = /*[[${balanceRanges}]]*/ {};
+        const balanceRangesLabels = Object.keys(balanceRangesData);
+        const balanceRangesValues = Object.values(balanceRangesData);
+
+        if (balanceRangesLabels.length > 0) {
+            new Chart(balanceRangesCtx, {
+                type: 'bar',
+                data: {
+                    labels: balanceRangesLabels,
+                    datasets: [{
+                        label: 'Percentage of Accounts',
+                        data: balanceRangesValues,
+                        backgroundColor: '#10b981',
+                        borderColor: '#059669',
+                        borderWidth: 1,
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return value.toFixed(1) + '%';
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        }
+
+        // Top Customers Chart
+        const topCustomersCtx = document.getElementById('topCustomersChart').getContext('2d');
+        const topCustomersData = /*[[${topCustomers}]]*/ [];
+        const topCustomersLabels = topCustomersData.map(customer => customer.name);
+        const topCustomersValues = topCustomersData.map(customer => customer.balance);
+
+        if (topCustomersData.length > 0) {
+            new Chart(topCustomersCtx, {
+                type: 'bar',
+                data: {
+                    labels: topCustomersLabels,
+                    datasets: [{
+                        label: 'Balance ($)',
+                        data: topCustomersValues,
+                        backgroundColor: '#f59e0b',
+                        borderColor: '#d97706',
+                        borderWidth: 1,
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return '$' + value.toLocaleString();
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        }
+
+        // Monthly Trends Chart
+        const monthlyTrendsCtx = document.getElementById('monthlyTrendsChart').getContext('2d');
+        const monthlyTrendsData = /*[[${monthlyTrends}]]*/ {};
+        const monthlyTrendsLabels = Object.keys(monthlyTrendsData);
+        const monthlyTrendsValues = Object.values(monthlyTrendsData);
+
+        if (monthlyTrendsLabels.length > 0) {
+            new Chart(monthlyTrendsCtx, {
+                type: 'line',
+                data: {
+                    labels: monthlyTrendsLabels,
+                    datasets: [{
+                        label: 'Transactions',
+                        data: monthlyTrendsValues,
+                        borderColor: '#8b5cf6',
+                        backgroundColor: 'rgba(139, 92, 246, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: '#8b5cf6',
+                        pointBorderColor: '#ffffff',
+                        pointBorderWidth: 2,
+                        pointRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        }
+    }
+
+    // Initialize charts when page loads
+    window.addEventListener('load', function() {
+        // ... existing load code ...
+        initializeCharts();
+    });
+</script>
+
+</body>
+</html>
