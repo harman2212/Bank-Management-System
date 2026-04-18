@@ -1,7 +1,7 @@
 # 💼 Bank Management Desktop Application
 
 ## 🚀 Quick Start
-👉 Download and run the application instantly (no setup required)
+👉 [Download Application](https://github.com/harman2212/Bank-Management-System/releases/download/v1.0/Bank.Management.System.rar)
 
 A fully functional desktop banking system with account management, transactions, and local database integration.
 
